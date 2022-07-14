@@ -2,7 +2,7 @@
 // NOTE:
 // I had all the challenges working except 5 (get), 6 (get) and 7 (put), and the 14 tests (I had not come to that yet). I first implemented everything for "Issue" mongoose model to work only. Got stuck and struggling with those failures, and then by searching for FCC forum help I found the following replit project which helped me understand what was missing, to unstuck myself:
 // https://replit.com/@murphy1188/issue-tracker#routes/api.js
-// That way I was also able to learn to optimize my code.
+// Only the GET method is identical to that project; everything else, it was myself that originally coded.
 // --------------------------------------------------------//
 
 'use strict';
@@ -28,7 +28,6 @@ const issueSchema = new mongoose.Schema({
   created_on: {type:Date, default:new Date().toISOString()},
   updated_on: {type:Date, default:new Date().toISOString()}
 });
-//----------------------------------------------------//
 //------------------ MONGOOSE: PROJECT -----------------//
 // Project Schema
 const projectSchema = new mongoose.Schema({
@@ -51,86 +50,6 @@ Issue.deleteMany({}, (err, aknowledge) => {
   console.log("success!", aknowledge)
 });
 */
-
-// ------------------ AUXILIARY FUNCTIONS ----------------- //
-function printPostErrorRequiredFieldsMissing(res) {
-  // all the required fields are not filled in
-  const errorMessageObj = {
-    error: 'required field(s) missing'
-  }
-  console.error(errorMessageObj);
-  return res.send(errorMessageObj);
-}
-function printPostSuccessProjectSave(project, res) {
-  project.save((err, postedNewProj) => {
-    if(err) return console.error(err);
-    //console.log("Project posted successfully with a new issue");
-    
-    const successMessageObj = {
-      result: 'successfully submitted',
-      _id: postedNewProj.issues.at(-1)._id.toString()
-    };
-    console.log(successMessageObj);
-    
-    // find by id the issue update
-    //console.log(postedNewProj.issues.at(-1))
-    return res.json(postedNewProj.issues.at(-1));
-  });
-}
-
-function printPutErrorMissingId(res) {
-  const errorMessageObj = { error: 'missing _id' };
-  console.log(errorMessageObj);
-  return res.send(errorMessageObj);
-}
-function printPutErrorNoUpdateFieldsSent(id, res) {
-  const errorMessageObj = {
-    error: 'no update field(s) sent',
-    '_id': id
-  };
-  console.error(errorMessageObj);
-  return res.send(errorMessageObj);
-}
-function printPutErrorCouldNotUpdate(id, res) {
-  const errorResponseObj = {
-    error : "could not update",
-    '_id': id
-  };
-  console.error(errorResponseObj);
-  return res.send(errorResponseObj);
-}
-function printPutSuccessSuccessfullyUpdated(id, res) {
-  // issue successfully updated
-  const updateResponseObj = {
-    result : "successfully updated",
-    '_id' : id
-  }
-  console.log(updateResponseObj);
-  return res.json(updateResponseObj);
-}
-
-function printDeleteErrorMissingId(res) {
-  const errorMessageObj = { error: 'missing _id' };
-  console.error(errorMessageObj)
-  return res.send(errorMessageObj);
-}
-function printDeleteErrorCouldNotDelete(id, res) {
-  const errorResponseObj = {
-    error : "could not delete",
-    '_id' : id
-  };
-  console.log(errorResponseObj);
-  return res.send(errorResponseObj);
-}
-function printDeleteSuccessSuccessfullyDeleted(id, res) {
-  const successResponseObj = {
-    result : "successfully deleted",
-    _id : id
-  };
-  console.log(successResponseObj);
-  return res.json(successResponseObj);
-}
-//----------------------------------------------------------//
 
 
 module.exports = function (app) {
@@ -158,7 +77,7 @@ module.exports = function (app) {
         if (Object.keys(req.query).length === 0) {
 
           // if proj queried is "null" (not found)
-          if (proj == null) {
+          if (!proj) {
 
             // create new project (since it does not exist)
             Project.create({ project: projectName }, (err, newProj) => {
@@ -406,3 +325,84 @@ module.exports = function (app) {
     });
     
 };
+
+
+// ------------------ AUXILIARY FUNCTIONS ----------------- //
+function printPostErrorRequiredFieldsMissing(res) {
+  // all the required fields are not filled in
+  const errorMessageObj = {
+    error: 'required field(s) missing'
+  }
+  console.error(errorMessageObj);
+  return res.send(errorMessageObj);
+}
+function printPostSuccessProjectSave(project, res) {
+  project.save((err, postedNewProj) => {
+    if(err) return console.error(err);
+    //console.log("Project posted successfully with a new issue");
+    
+    const successMessageObj = {
+      result: 'successfully submitted',
+      _id: postedNewProj.issues.at(-1)._id.toString()
+    };
+    console.log(successMessageObj);
+    
+    // find by id the issue update
+    //console.log(postedNewProj.issues.at(-1))
+    return res.json(postedNewProj.issues.at(-1));
+  });
+}
+
+function printPutErrorMissingId(res) {
+  const errorMessageObj = { error: 'missing _id' };
+  console.log(errorMessageObj);
+  return res.send(errorMessageObj);
+}
+function printPutErrorNoUpdateFieldsSent(id, res) {
+  const errorMessageObj = {
+    error: 'no update field(s) sent',
+    '_id': id
+  };
+  console.error(errorMessageObj);
+  return res.send(errorMessageObj);
+}
+function printPutErrorCouldNotUpdate(id, res) {
+  const errorResponseObj = {
+    error : "could not update",
+    '_id': id
+  };
+  console.error(errorResponseObj);
+  return res.send(errorResponseObj);
+}
+function printPutSuccessSuccessfullyUpdated(id, res) {
+  // issue successfully updated
+  const updateResponseObj = {
+    result : "successfully updated",
+    '_id' : id
+  }
+  console.log(updateResponseObj);
+  return res.json(updateResponseObj);
+}
+
+function printDeleteErrorMissingId(res) {
+  const errorMessageObj = { error: 'missing _id' };
+  console.error(errorMessageObj)
+  return res.send(errorMessageObj);
+}
+function printDeleteErrorCouldNotDelete(id, res) {
+  const errorResponseObj = {
+    error : "could not delete",
+    '_id' : id
+  };
+  console.log(errorResponseObj);
+  return res.send(errorResponseObj);
+}
+function printDeleteSuccessSuccessfullyDeleted(id, res) {
+  const successResponseObj = {
+    result : "successfully deleted",
+    _id : id
+  };
+  console.log(successResponseObj);
+  return res.json(successResponseObj);
+}
+//----------------------------------------------------------//
